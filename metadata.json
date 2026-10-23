@@ -1,0 +1,7 @@
+{
+  "name": "ChronoTile: Echoes of the Step",
+  "description": "An atmospheric 3D spatial puzzle game where every step you take collapses the floor behind you for the next turn. Navigate gates, keys, toggle switches, and teleporters in a race against your own footsteps.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
