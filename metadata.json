@@ -1,6 +1,6 @@
 {
   "name": "ChronoTile: Echoes of the Step",
-  "description": "An atmospheric 3D spatial puzzle game where every step you take collapses the floor behind you for the next turn. Navigate gates, keys, toggle switches, and teleporters in a race against your own footsteps.",
+  "description": "Problem Statement #3: An updated 3D spatial puzzle game featuring the unique sole rule change: you cannot go backwards. Every step collapses the tile behind you for 1 turn. Navigate gates, keys, switches, and teleporters with forward momentum.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

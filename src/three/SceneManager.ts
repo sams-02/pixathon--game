@@ -144,7 +144,7 @@ export class ChronoSceneManager {
     });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.3;
+    this.renderer.toneMappingExposure = 1.0;
     this.renderer.setPixelRatio(
       this.isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2)
     );
@@ -154,13 +154,9 @@ export class ChronoSceneManager {
 
     container.appendChild(this.renderer.domElement);
 
-    // 3. Realistic Void Scene & Studio PBR Environment
+    // 3. Realistic Void Scene with Controlled Non-Glittering Environment
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x02040a);
-
-    this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-    this.scene.environment = this.pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
-    this.pmremGenerator.dispose();
 
     // 4. Camera Setup with Enlarged Map FOV
     this.camera = new THREE.PerspectiveCamera(
@@ -170,9 +166,9 @@ export class ChronoSceneManager {
       1000
     );
 
-    // 5. Authentic Astrophysical Solar Lighting
-    this.sunLight = new THREE.DirectionalLight(0xfffaed, 3.4);
-    this.sunLight.position.set(24, 40, 20);
+    // 5. Balanced Astrophysical Diffuse Lighting (Matte & Non-Glaring)
+    this.sunLight = new THREE.DirectionalLight(0xfff8ee, 1.6);
+    this.sunLight.position.set(20, 36, 18);
     this.sunLight.castShadow = !this.isSoftwareGl;
     if (this.sunLight.castShadow) {
       this.sunLight.shadow.mapSize.width = 2048;
@@ -189,10 +185,10 @@ export class ChronoSceneManager {
     }
     this.scene.add(this.sunLight);
 
-    this.nebulaFillLight = new THREE.HemisphereLight(0x475569, 0x070b16, 0.8);
+    this.nebulaFillLight = new THREE.HemisphereLight(0x94a3b8, 0x0b1120, 1.25);
     this.scene.add(this.nebulaFillLight);
 
-    this.earthshineRimLight = new THREE.DirectionalLight(0x38bdf8, 1.4);
+    this.earthshineRimLight = new THREE.DirectionalLight(0x38bdf8, 0.45);
     this.earthshineRimLight.position.set(-20, -10, -25);
     this.scene.add(this.earthshineRimLight);
 
@@ -921,46 +917,55 @@ export class ChronoSceneManager {
     group.position.set(wx, 0, wz);
     group.userData = { gridX: x, gridY: y, isWalkable: true, isCollapsed: false };
 
-    const deckGeo = new THREE.BoxGeometry(0.96, 0.16, 0.96);
+    // 1. Deep Matte Dark Foundation Rim (depth -0.09 to -0.01)
+    // Sits BELOW the deck plate, creating a distinct border groove with zero coplanar face overlap!
+    const baseGeo = new THREE.BoxGeometry(0.98, 0.16, 0.98);
+    const baseMat = new THREE.MeshStandardMaterial({
+      color: 0x090d16,
+      roughness: 0.98,
+      metalness: 0.02,
+    });
+    const base = new THREE.Mesh(baseGeo, baseMat);
+    base.position.y = -0.09;
+    base.receiveShadow = !this.isSoftwareGl;
+    base.name = 'baseChassis';
+    group.add(base);
+
+    // 2. Tactical Matte Walking Plate (sits raised from y = -0.01 to y = +0.03)
+    // Completely non-overlapping with base rim, giving clean playable tile separation without glittering
+    const deckGeo = new THREE.BoxGeometry(0.92, 0.04, 0.92);
     const deckMat = new THREE.MeshStandardMaterial({
-      color: 0x1a2436,
-      roughness: 0.38,
-      metalness: 0.82,
+      color: 0x1e2736,
+      roughness: 0.95,
+      metalness: 0.02,
     });
     const deck = new THREE.Mesh(deckGeo, deckMat);
-    deck.position.y = -0.08;
+    deck.position.y = 0.01;
     deck.receiveShadow = !this.isSoftwareGl;
+    deck.name = 'deckMesh';
     group.add(deck);
 
-    const frameGeo = new THREE.BoxGeometry(0.98, 0.04, 0.98);
-    const frameMat = new THREE.MeshStandardMaterial({
-      color: 0x334155,
-      roughness: 0.25,
-      metalness: 0.9,
-    });
-    const frame = new THREE.Mesh(frameGeo, frameMat);
-    frame.position.y = -0.02;
-    group.add(frame);
-
-    const ledCornerGeo = new THREE.CircleGeometry(0.035, 12);
-    const ledCornerMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    // 3. Subtle Non-glaring Corner Alignment Rivets (sitting at y = 0.031)
+    const ledCornerGeo = new THREE.CircleGeometry(0.026, 8);
+    const ledCornerMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
     const offsets = [
-      [-0.4, -0.4],
-      [0.4, -0.4],
-      [-0.4, 0.4],
-      [0.4, 0.4],
+      [-0.38, -0.38],
+      [0.38, -0.38],
+      [-0.38, 0.38],
+      [0.38, 0.38],
     ];
     offsets.forEach(([cx, cz]) => {
       const ledM = new THREE.Mesh(ledCornerGeo, ledCornerMat);
       ledM.rotation.x = -Math.PI / 2;
-      ledM.position.set(cx, 0.003, cz);
+      ledM.position.set(cx, 0.031, cz);
       group.add(ledM);
     });
 
+    // 4. Matte Under-Truss Struts
     const trussMat = new THREE.MeshStandardMaterial({
-      color: 0x0f172a,
-      roughness: 0.5,
-      metalness: 0.9,
+      color: 0x070b14,
+      roughness: 0.96,
+      metalness: 0.05,
     });
     const strutGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.6, 6);
     const strut1 = new THREE.Mesh(strutGeo, trussMat);
@@ -971,9 +976,10 @@ export class ChronoSceneManager {
     strut2.position.set(0.35, -0.38, 0.35);
     group.add(strut2);
 
-    const hazardRingGeo = new THREE.RingGeometry(0.26, 0.42, 24);
+    // 5. Collapsed Hazard Indicator Ring (visible when floor uncouples behind player)
+    const hazardRingGeo = new THREE.RingGeometry(0.24, 0.40, 24);
     const hazardRingMat = new THREE.MeshBasicMaterial({
-      color: 0xf43f5e,
+      color: 0xef4444,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: 0,
@@ -981,7 +987,7 @@ export class ChronoSceneManager {
     });
     const hazardRing = new THREE.Mesh(hazardRingGeo, hazardRingMat);
     hazardRing.rotation.x = -Math.PI / 2;
-    hazardRing.position.y = 0.005;
+    hazardRing.position.y = 0.032;
     hazardRing.name = 'hazardRing';
     group.add(hazardRing);
 
@@ -993,11 +999,12 @@ export class ChronoSceneManager {
     group.position.set(wx, 0, wz);
     group.userData = { isWall: true };
 
+    // Column: Matte monolithic dark basalt/slate
     const colGeo = new THREE.BoxGeometry(0.96, 1.1, 0.96);
     const colMat = new THREE.MeshStandardMaterial({
       color: 0x0b1120,
-      roughness: 0.65,
-      metalness: 0.75,
+      roughness: 0.94,
+      metalness: 0.04,
     });
     const col = new THREE.Mesh(colGeo, colMat);
     col.position.y = 0.55;
@@ -1005,21 +1012,23 @@ export class ChronoSceneManager {
     col.receiveShadow = !this.isSoftwareGl;
     group.add(col);
 
+    // Column Top: Dark matte cap, zero reflection when viewed from above
     const topGeo = new THREE.BoxGeometry(0.88, 0.08, 0.88);
     const topMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      roughness: 0.3,
-      metalness: 0.9,
+      color: 0x172033,
+      roughness: 0.92,
+      metalness: 0.04,
     });
     const top = new THREE.Mesh(topGeo, topMat);
     top.position.y = 1.14;
     group.add(top);
 
+    // Tactical Hazard Stripe
     const stripeGeo = new THREE.PlaneGeometry(0.8, 0.12);
     const stripeMat = new THREE.MeshStandardMaterial({
-      color: 0xf59e0b,
-      roughness: 0.4,
-      metalness: 0.5,
+      color: 0xd97706,
+      roughness: 0.85,
+      metalness: 0.05,
     });
     const stripe = new THREE.Mesh(stripeGeo, stripeMat);
     stripe.position.set(0, 0.6, 0.485);
@@ -1325,17 +1334,17 @@ export class ChronoSceneManager {
       group.userData.isCollapsed = isCollapsed;
 
       const hazard = group.getObjectByName('hazardRing') as THREE.Mesh;
-      const deck = group.children[0] as THREE.Mesh;
+      const deck = (group.getObjectByName('deckMesh') || group.children[1] || group.children[0]) as THREE.Mesh;
 
       if (isCollapsed) {
-        group.position.y = -0.36;
+        group.position.y = -0.42;
         if (hazard) {
           (hazard.material as THREE.MeshBasicMaterial).opacity = 0.95;
         }
         if (deck && deck.material) {
-          (deck.material as THREE.MeshStandardMaterial).color.setHex(0x381216);
-          (deck.material as THREE.MeshStandardMaterial).emissive.setHex(0x991b1b);
-          (deck.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.8;
+          (deck.material as THREE.MeshStandardMaterial).color.setHex(0x2d0a0e);
+          (deck.material as THREE.MeshStandardMaterial).emissive.setHex(0xdc2626);
+          (deck.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.85;
         }
       } else {
         group.position.y = 0;
@@ -1343,7 +1352,7 @@ export class ChronoSceneManager {
           (hazard.material as THREE.MeshBasicMaterial).opacity = 0;
         }
         if (deck && deck.material) {
-          (deck.material as THREE.MeshStandardMaterial).color.setHex(0x1a2436);
+          (deck.material as THREE.MeshStandardMaterial).color.setHex(0x1e2736);
           (deck.material as THREE.MeshStandardMaterial).emissive.setHex(0x000000);
           (deck.material as THREE.MeshStandardMaterial).emissiveIntensity = 0;
         }

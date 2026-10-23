@@ -792,6 +792,7 @@ export default function App() {
           <GameHud
             level={currentLevel}
             moveCount={moveCount}
+            prevPos={prevPos}
             canUndo={history.length > 0}
             onUndo={handleUndo}
             onReset={handleReset}

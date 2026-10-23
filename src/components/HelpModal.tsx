@@ -68,19 +68,19 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose, isFirstBoot = fal
                 <AlertOctagon className="w-6 h-6 animate-pulse" />
               </div>
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-red-900 border border-red-500 text-red-200 uppercase tracking-widest">
-                    CRITICAL TEMPORAL LAW
+                    PROBLEM STATEMENT #3
                   </span>
                   <span className="text-xs text-amber-300 font-bold uppercase tracking-wide">
-                    Mandatory Rule
+                    Sole Rule Change Added
                   </span>
                 </div>
                 <h4 className="text-base sm:text-lg font-black text-white tracking-tight">
-                  YOU CANNOT MOVE BACKWARD!
+                  NEW RULE: WE CANNOT GO BACKWARDS!
                 </h4>
                 <p className="text-xs sm:text-sm leading-relaxed text-red-100 font-medium">
-                  The moment you step off any platform tile, it <span className="text-amber-300 font-bold underline">uncouples and dissolves into deep space for the following turn</span>. You cannot retrace your last step. If you walk into a 1-tile corridor or attempt to back up, you will immediately trap yourself against your own collapsed footprint!
+                  We have updated the existing puzzle game with this single unique rule: <span className="text-amber-300 font-bold underline">the tile you just left collapses into space for 1 turn</span>. You can NEVER immediately step backward into your previous position! Moving into a 1-tile corridor without an exit or teleporter will trap you. Plan your route in loops or multi-tile chambers!
                 </p>
               </div>
             </div>

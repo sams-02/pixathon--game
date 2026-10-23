@@ -16,12 +16,13 @@ import {
   Timer,
   Sparkles,
 } from 'lucide-react';
-import { LevelDef, AstronautAbilities } from '../types/game';
+import { LevelDef, AstronautAbilities, Position } from '../types/game';
 import { sound } from '../audio/sound';
 
 interface GameHudProps {
   level: LevelDef;
   moveCount: number;
+  prevPos?: Position | null;
   canUndo: boolean;
   onUndo: () => void;
   onReset: () => void;
@@ -47,6 +48,7 @@ interface GameHudProps {
 export const GameHud: React.FC<GameHudProps> = ({
   level,
   moveCount,
+  prevPos = null,
   canUndo,
   onUndo,
   onReset,
@@ -70,6 +72,16 @@ export const GameHud: React.FC<GameHudProps> = ({
 }) => {
   const isOptimal = moveCount <= level.parMoves;
   const isSpeedrunStar = elapsedSeconds <= 30;
+  const [showRuleToast, setShowRuleToast] = React.useState<boolean>(true);
+
+  // Auto-announce rule on each level load
+  React.useEffect(() => {
+    setShowRuleToast(true);
+    const timer = setTimeout(() => {
+      setShowRuleToast(false);
+    }, 7000);
+    return () => clearTimeout(timer);
+  }, [level.name]);
 
   return (
     <div className="absolute top-0 inset-x-0 z-20 flex flex-col pointer-events-none select-none text-slate-100">
@@ -81,11 +93,62 @@ export const GameHud: React.FC<GameHudProps> = ({
         </div>
       )}
 
-      {/* Centered Mandatory Temporal Law Banner */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-auto hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/90 border border-amber-500/60 shadow-lg text-xs font-mono text-amber-300">
-        <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-        <span className="font-bold text-white uppercase tracking-wider">TEMPORAL LAW:</span>
-        <span className="text-amber-200 font-semibold">No Backward Steps (Tile collapses 1 turn)</span>
+      {/* Prominent Level-Start Problem Statement #3 Rule Announcement Toast */}
+      {showRuleToast && (
+        <div className="w-full px-4 pt-2 pb-1 flex justify-center pointer-events-auto animate-in slide-in-from-top duration-300">
+          <div
+            onClick={() => setShowRuleToast(false)}
+            className="max-w-2xl w-full p-3 md:p-3.5 rounded-2xl bg-slate-950/95 border-2 border-amber-500/80 shadow-[0_10px_35px_rgba(245,158,11,0.3)] text-left flex items-center justify-between gap-3.5 cursor-pointer hover:border-amber-400 transition-all backdrop-blur-md"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center shrink-0 text-amber-300">
+                <span className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-950 border border-amber-500 text-amber-300 uppercase tracking-wider">
+                    Problem Statement #3
+                  </span>
+                  <span className="text-xs font-bold text-white uppercase tracking-tight">
+                    Sole Rule Change Active:
+                  </span>
+                </div>
+                <div className="text-sm font-black text-amber-300 tracking-tight mt-0.5">
+                  YOU CANNOT GO BACKWARDS
+                </div>
+                <div className="text-xs text-slate-300 font-medium leading-tight mt-0.5">
+                  Every step you take collapses the floor behind you for 1 turn. Stepping backward is forbidden!
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowRuleToast(false);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-mono font-semibold shrink-0 cursor-pointer"
+            >
+              Dismiss ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Persistent Center Problem Statement #3 Status Badge */}
+      <div className="w-full flex justify-center pt-1.5 pointer-events-auto">
+        <div
+          onClick={() => setShowRuleToast(!showRuleToast)}
+          className="flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-950/90 border border-amber-500/70 shadow-lg text-[11px] md:text-xs font-mono text-amber-300 cursor-pointer hover:bg-slate-900 transition-all"
+          title="Click to view full Problem Statement #3 rule announcement"
+        >
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          <span className="font-bold text-white uppercase tracking-wider">RULE #3:</span>
+          <span className="text-amber-200 font-semibold">Cannot Go Backwards</span>
+          <span className="text-slate-500">|</span>
+          <span className="text-slate-300 font-mono">
+            Collapsed: {prevPos ? `(${prevPos.x}, ${prevPos.y}) [LOCKED]` : 'None (Start)'}
+          </span>
+        </div>
       </div>
 
       {/* Main Top Bar */}

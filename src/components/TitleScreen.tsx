@@ -62,18 +62,36 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
         </div>
       </div>
 
-      {/* Center Hero Mission Briefing */}
-      <div className="flex flex-col items-center text-center my-auto max-w-2xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-medium tracking-wider mb-5 uppercase shadow-inner">
-          <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-          <span>Core Law: Deck Interlock Uncouples Behind You</span>
+      {/* Center Hero Mission Briefing with Problem Statement #3 Announcement */}
+      <div className="flex flex-col items-center text-center my-auto max-w-3xl mx-auto px-4">
+        {/* Prominent Problem Statement #3 Rule Announcement Banner */}
+        <div className="w-full mb-6 p-4 rounded-2xl bg-slate-950/90 border-2 border-amber-500/80 shadow-[0_0_30px_rgba(245,158,11,0.25)] text-left flex flex-col sm:flex-row items-center gap-4 pointer-events-auto">
+          <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center shrink-0 text-amber-300">
+            <ShieldAlert className="w-7 h-7 text-amber-400 animate-pulse" />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/80 text-amber-300 font-mono text-[11px] font-bold uppercase tracking-widest">
+                Problem Statement #3
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-500/60 text-cyan-300 font-mono text-[11px] font-semibold uppercase">
+                Sole Rule Change Added
+              </span>
+            </div>
+            <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+              NEW RULE: YOU CANNOT GO BACKWARDS
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed mt-0.5">
+              We updated the existing puzzle game with one unique rule: <span className="text-amber-300 font-bold">the tile you just left collapses for 1 turn</span>. You can never step backward into your previous position!
+            </p>
+          </div>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent drop-shadow-md font-sans mb-4">
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent drop-shadow-md font-sans mb-3">
           CHRONOTILE
         </h1>
-        <p className="text-lg md:text-xl text-slate-200 font-light max-w-xl leading-relaxed mb-8 drop-shadow">
-          Every time Commander Elena moves across the orbital array, the deck plate just vacated <span className="text-amber-300 font-semibold">uncouples for 1 turn</span>. Chart an exact spatial vector to the pressurized airlock.
+        <p className="text-base md:text-lg text-slate-200 font-light max-w-xl leading-relaxed mb-6 drop-shadow">
+          Echoes of the Step — Navigate high-precision orbital platforms where your own footsteps lock the deck behind you. Plan every vector two paces ahead.
         </p>
 
         {/* Action Buttons */}
